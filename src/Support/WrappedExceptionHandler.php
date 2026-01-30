@@ -45,7 +45,7 @@ readonly class WrappedExceptionHandler implements ExceptionHandler
             return false;
         }
 
-        $ttl = (int) Config::get('catchr.dedupe.ttl_seconds', 60);
+        $ttl = (int) Config::get('catchr.dedupe.ttl_seconds', 300);
         $prefix = (string) Config::get('catchr.dedupe.prefix', 'catchr:seen:');
         $store = Config::get('catchr.dedupe.cache_store');
 
@@ -87,14 +87,21 @@ readonly class WrappedExceptionHandler implements ExceptionHandler
             return $message;
         }
 
-        $message = preg_replace(
+        $uuidNormalized = preg_replace(
             '/\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b/i',
             '{uuid}',
             $message
         );
 
-        return preg_replace('/\b\d{4,}\b/', '{n}', $message);
+        if ($uuidNormalized === null) {
+            return $message;
+        }
+
+        $numbersNormalized = preg_replace('/\b\d{4,}\b/', '{n}', $uuidNormalized);
+
+        return $numbersNormalized ?? $uuidNormalized;
     }
+
 
     public function shouldReport(Throwable $e): bool
     {
