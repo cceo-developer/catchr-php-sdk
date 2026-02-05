@@ -13,14 +13,21 @@ readonly class HttpReporter
 
     public function report(Throwable $e): void
     {
-        $endpoint = Config::get('catchr.endpoint');
+        $envs = Config::get('catchr.environments', []);
+        $appEnv = Config::get('app.env');
+        $endpoints = Config::get('catchr.endpoints', []);
+        $timeout = (int) Config::get('catchr.timeout', 5);
 
-        if (!Config::get('catchr.enabled', true) || !$endpoint) {
+        if (!is_array($endpoints)) {
+            $endpoints = [];
+        }
+
+        $endpoints = array_values(array_filter(array_map('trim', $endpoints)));
+
+        if (!Config::get('catchr.enabled', true) || empty($endpoints)) {
             return;
         }
 
-        $envs = Config::get('catchr.environments', []);
-        $appEnv = Config::get('app.env');
         if (!empty($envs) && $appEnv && !in_array($appEnv, $envs, true)) {
             return;
         }
@@ -40,9 +47,15 @@ readonly class HttpReporter
 
         $payload = $this->builder->build($e, $request);
 
-        Http::timeout((int) Config::get('catchr.timeout', 5))
-            ->acceptJson()
-            ->asJson()
-            ->post($endpoint, $payload);
+        foreach ($endpoints as $endpoint) {
+            try {
+                Http::timeout($timeout)
+                    ->acceptJson()
+                    ->asJson()
+                    ->post($endpoint, $payload);
+            } catch (Throwable $ignored) {
+                @error_log('[Catchr] Failed to post to endpoint: ' . $endpoint . ' | ' . get_class($ignored) . ' - ' . $ignored->getMessage());
+            }
+        }
     }
 }
