@@ -22,8 +22,6 @@ readonly class HttpReporter
             $endpoints = [];
         }
 
-        $endpoints = array_values(array_filter(array_map('trim', $endpoints)));
-
         if (!Config::get('catchr.enabled', true) || empty($endpoints)) {
             return;
         }
