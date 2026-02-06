@@ -53,13 +53,11 @@ class CatchrTestCommand extends Command
             $handler = app(\Illuminate\Contracts\Debug\ExceptionHandler::class);
             $hadError = false;
 
-            foreach ([1, 2] as $i) {
-                try {
-                    $trigger();
-                } catch (\Throwable $e) {
-                    $hadError = true;
-                    $handler->report($e);
-                }
+            try {
+                $trigger();
+            } catch (\Throwable $e) {
+                $hadError = true;
+                $handler->report($e);
             }
 
             return $hadError ? self::FAILURE : self::SUCCESS;
