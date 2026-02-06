@@ -121,7 +121,7 @@ class CatchrTestCommand extends Command
 
         $this->line('');
 
-        // Warnings amigables
+        // Warnings
         if (!$enabled) {
             $this->warn('Catchr is disabled (CATCHR_ENABLED=false).');
         }
