@@ -29,7 +29,8 @@ class CatchrTestCommand extends Command
         $hasCriticalIssues = (
             $summary['enabled'] === false ||
             $summary['endpoints_count'] === 0 ||
-            $summary['env_allowed'] === false
+            $summary['env_allowed'] === false ||
+            $summary['keys'] === false
         );
 
         if ($hasCriticalIssues && !$noAbort) {
@@ -47,6 +48,9 @@ class CatchrTestCommand extends Command
     private function printCatchrSummary(): array
     {
         $enabled = (bool) Config::get('catchr.enabled', true);
+
+        $public = (bool) Config::get('catchr.public_key');
+        $private = (bool) Config::get('catchr.private_key');
 
         $endpoints = Config::get('catchr.endpoints', []);
         if (!is_array($endpoints)) $endpoints = [];
@@ -86,6 +90,9 @@ class CatchrTestCommand extends Command
             }
         }
 
+        $this->line('Public key: ' . ($public ? '<info>true</info>' : '<error>false</error>'));
+        $this->line('Private key: ' . ($private ? '<info>true</info>' : '<error>false</error>'));
+
         $this->line('');
         $this->info('Dedupe');
         $this->line('  Enabled: ' . ($dedupeEnabled ? '<info>true</info>' : '<comment>false</comment>'));
@@ -107,10 +114,13 @@ class CatchrTestCommand extends Command
             $this->warn("Current env '{$appEnv}' is not in CATCHR_ENVS. Catchr will not report.");
         }
 
+        $keys = ($public && $private);
+
         return [
             'enabled' => $enabled,
             'endpoints_count' => count($endpoints),
             'env_allowed' => $envAllowed,
+            'keys' => $keys
         ];
     }
 
