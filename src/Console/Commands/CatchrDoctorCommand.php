@@ -268,13 +268,13 @@ class CatchrDoctorCommand extends Command
             // Basic URL check (format)
             if ($endpoint === '') {
                 $fail++;
-                $rows[] = [$label, '<error>FAIL</error>', '(empty)', '-', 'Remove empty endpoint from CATCHR_ENDPOINTS'];
+                $rows[] = [$label, '<error>FAIL</error>', '(empty)', '-', '-', 'Remove empty endpoint from CATCHR_ENDPOINTS'];
                 continue;
             }
 
             if (!Str::startsWith($endpoint, ['http://', 'https://'])) {
                 $warn++;
-                $rows[] = [$label, '<comment>WARN</comment>', $endpoint, '-', 'URL should start with https://'];
+                $rows[] = [$label, '<comment>WARN</comment>', $endpoint, '-', '-', 'URL should start with https://'];
                 continue;
             }
 
