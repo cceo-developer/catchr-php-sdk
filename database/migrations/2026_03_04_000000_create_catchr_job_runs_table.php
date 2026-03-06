@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Purchases\Supplier\Supplier;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -19,6 +18,7 @@ return new class extends Migration
             $table->string('job_id')->nullable();
             $table->string('uuid')->nullable();
             $table->string('fingerprint', 64)->index();
+            $table->string('run_key')->unique();
 
             $table->string('status')->index(); // processing|processed|failed
             $table->unsignedInteger('attempts')->default(0);
@@ -36,5 +36,10 @@ return new class extends Migration
 
             $table->timestamps();
         });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('catchr_job_runs');
     }
 };

@@ -10,8 +10,14 @@ class QueueJobMeta
     {
         $payload = $job->payload();
 
-        $jobName = method_exists($job, 'resolveName') ? $job->resolveName() : ($payload['displayName'] ?? null);
-        $queue = method_exists($job, 'getQueue') ? $job->getQueue() : ($payload['queue'] ?? null);
+        $jobName = method_exists($job, 'resolveName')
+            ? $job->resolveName()
+            : ($payload['displayName'] ?? null);
+
+        $queue = method_exists($job, 'getQueue')
+            ? $job->getQueue()
+            : ($payload['queue'] ?? null);
+
         $attempts = method_exists($job, 'attempts') ? (int) $job->attempts() : 0;
 
         $uuid = $payload['uuid'] ?? null;
@@ -20,24 +26,29 @@ class QueueJobMeta
 
         $jobId = method_exists($job, 'getJobId') ? (string) $job->getJobId() : null;
 
+        $runKey = $uuid ?: ($jobId ?: hash('sha256', ($connectionName . '|' . $queue . '|' . $jobName . '|' . microtime(true))));
+
         $fingerprintBase = implode('|', array_filter([
-            $connectionName,
-            $queue,
-            $jobName,
-            $jobId,
-            $uuid,
+            (string) $connectionName,
+            (string) $queue,
+            (string) $jobName,
+            (string) ($payload['maxTries'] ?? ''),
+            (string) ($payload['timeout'] ?? ''),
         ]));
 
         return [
+            'run_key' => $runKey,
+            'fingerprint' => hash('sha256', $fingerprintBase ?: json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)),
+
             'connection' => $connectionName,
             'queue' => $queue,
             'job_name' => $jobName,
             'job_id' => $jobId,
             'uuid' => $uuid,
+
             'attempts' => $attempts,
             'max_tries' => is_null($maxTries) ? null : (int) $maxTries,
             'timeout' => is_null($timeout) ? null : (int) $timeout,
-            'fingerprint' => hash('sha256', $fingerprintBase ?: json_encode($payload)),
         ];
     }
 }

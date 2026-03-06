@@ -19,8 +19,9 @@ class JobRunStore
             $now = Carbon::now();
 
             DB::table(self::TABLE)->updateOrInsert(
-                ['fingerprint' => $meta['fingerprint']],
+                ['run_key' => $meta['run_key']],
                 [
+                    'fingerprint' => $meta['fingerprint'] ?? null,
                     'connection' => $meta['connection'] ?? null,
                     'queue' => $meta['queue'] ?? null,
                     'job_name' => $meta['job_name'] ?? null,
@@ -52,15 +53,16 @@ class JobRunStore
             $now = Carbon::now();
 
             $row = DB::table(self::TABLE)
-                ->where('fingerprint', $meta['fingerprint'])
+                ->where('run_key', $meta['run_key'])
                 ->first();
 
             $startedAt = $row?->started_at ? Carbon::parse($row->started_at) : null;
             $durationMs = $startedAt ? $startedAt->diffInMilliseconds($now) : null;
 
             DB::table(self::TABLE)->updateOrInsert(
-                ['fingerprint' => $meta['fingerprint']],
+                ['run_key' => $meta['run_key']],
                 [
+                    'fingerprint' => $meta['fingerprint'] ?? null,
                     'connection' => $meta['connection'] ?? null,
                     'queue' => $meta['queue'] ?? null,
                     'job_name' => $meta['job_name'] ?? null,
@@ -76,7 +78,7 @@ class JobRunStore
                     'duration_ms' => $durationMs,
 
                     'updated_at' => $now,
-                    'created_at' => $row ? $row->created_at : $now,
+                    'created_at' => $row?->created_at ?? $now,
                 ]
             );
 
@@ -90,15 +92,16 @@ class JobRunStore
             $now = Carbon::now();
 
             $row = DB::table(self::TABLE)
-                ->where('fingerprint', $meta['fingerprint'])
+                ->where('run_key', $meta['run_key'])
                 ->first();
 
             $startedAt = $row?->started_at ? Carbon::parse($row->started_at) : null;
-            $durationMs = $startedAt ? $startedAt->diffInMilliseconds($now) : null;
+            $durationMs = $startedAt?->diffInMilliseconds($now);
 
             DB::table(self::TABLE)->updateOrInsert(
-                ['fingerprint' => $meta['fingerprint']],
+                ['run_key' => $meta['run_key']],
                 [
+                    'fingerprint' => $meta['fingerprint'] ?? null,
                     'connection' => $meta['connection'] ?? null,
                     'queue' => $meta['queue'] ?? null,
                     'job_name' => $meta['job_name'] ?? null,
@@ -117,7 +120,7 @@ class JobRunStore
                     'exception_message' => $e->getMessage(),
 
                     'updated_at' => $now,
-                    'created_at' => $row ? $row->created_at : $now,
+                    'created_at' => $row?->created_at ?? $now,
                 ]
             );
 
@@ -126,9 +129,9 @@ class JobRunStore
     }
 
     /**
-     * Ejecuta una operación de DB de forma segura.
-     * - Si no existe la tabla: no hace nada.
-     * - Si falla DB: no revienta (solo registra error_log).
+     * Perform a secure operation on data dabe.
+     * - if the table does not exist: the function does nothing.
+     * - If DB fails: it does not crash (it only records error_log).
      */
     private function safe(callable $fn)
     {

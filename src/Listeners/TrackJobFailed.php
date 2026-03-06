@@ -32,6 +32,7 @@ class TrackJobFailed
                     'attempts' => $meta['attempts'],
                     'max_tries' => $meta['max_tries'],
                     'timeout' => $meta['timeout'],
+                    'run_key' => $meta['run_key'],
                     'duration_ms' => $durationMs,
                     'status' => 'failed',
                 ],

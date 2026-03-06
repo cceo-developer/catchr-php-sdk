@@ -32,9 +32,10 @@ class TrackJobProcessing
                     'attempts' => $meta['attempts'],
                     'max_tries' => $meta['max_tries'],
                     'timeout' => $meta['timeout'],
+                    'run_key' => $meta['run_key'],
                     'status' => 'processing',
                 ],
-                exception: $event->exception
+                exception: null
             );
         } catch (Throwable $ignored) {
             @error_log('[Catchr] Failed to track job processing: ' . get_class($ignored) . ' - ' . $ignored->getMessage());

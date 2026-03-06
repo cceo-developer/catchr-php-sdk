@@ -14,7 +14,7 @@ use Throwable;
 class CatchrDoctorCommand extends Command
 {
     protected $signature = 'catchr:doctor';
-    protected $description = 'Diagnose Catchr configuration (required, dedupe, endpoints).';
+    protected $description = 'Diagnose Catchr configuration (required, dedupe, endpoints, queue).';
 
     private int $fails = 0;
     private int $warns = 0;
@@ -424,7 +424,7 @@ class CatchrDoctorCommand extends Command
         }
 
         if(!Schema::hasTable('catchr_job_runs')) {
-            $rows[] = $this->rowFail('Table', 'false', 'The table catcher_job_runs does not exist');
+            $rows[] = $this->rowFail('Table', 'false', 'The table catchr_job_runs does not exist');
         } else {
             $rows[] = $this->rowOk('Table', 'true');
         }
