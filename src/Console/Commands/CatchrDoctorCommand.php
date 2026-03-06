@@ -4,6 +4,7 @@ namespace CceoDeveloper\Catchr\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
@@ -13,7 +14,7 @@ use Throwable;
 class CatchrDoctorCommand extends Command
 {
     protected $signature = 'catchr:doctor';
-    protected $description = 'Diagnose Catchr configuration (required, dedupe, endpoints).';
+    protected $description = 'Diagnose Catchr configuration (required, dedupe, endpoints, queue).';
 
     private int $fails = 0;
     private int $warns = 0;
@@ -27,6 +28,7 @@ class CatchrDoctorCommand extends Command
         $this->checkDedupeConfig();
         $this->checkEndpoints();
         $this->checkConnectivity();
+        $this->checkQueueConfig();
 
         $this->newLine();
 
@@ -384,5 +386,49 @@ class CatchrDoctorCommand extends Command
         }
 
         return 'Network/HTTP error: check connectivity and endpoint availability';
+    }
+
+    private function checkQueueConfig(): void
+    {
+        $enabled    = (bool) Config::get('catchr.queue.enabled', true);
+        $processing = (bool) Config::get('catchr.queue.report_processing', true);
+        $processed  = (bool) Config::get('catchr.queue.report_processed', true);
+        $failed     = (bool) Config::get('catchr.queue.report_failed', true);
+
+        $this->section('Queue config');
+
+        $rows = [];
+
+        if (!$enabled) {
+            $rows[] = $this->rowWarn('Queue enabled', 'false', 'The jobs will not be reported');
+        } else {
+            $rows[] = $this->rowOk('Queue enabled', 'true');
+        }
+
+        if (!$processing) {
+            $rows[] = $this->rowWarn('Processing enabled', 'false', 'The jobs processing will not be reported');
+        } else {
+            $rows[] = $this->rowOk('Processing enabled', 'true');
+        }
+
+        if (!$processed) {
+            $rows[] = $this->rowWarn('Processed enabled', 'false', 'The jobs processed will not be reported');
+        } else {
+            $rows[] = $this->rowOk('Processed enabled', 'true');
+        }
+
+        if (!$failed) {
+            $rows[] = $this->rowWarn('Failed enabled', 'false', 'The jobs failed will not be reported');
+        } else {
+            $rows[] = $this->rowOk('Failed enabled', 'true');
+        }
+
+        if(!Schema::hasTable('catchr_job_runs')) {
+            $rows[] = $this->rowFail('Table', 'false', 'The table catchr_job_runs does not exist');
+        } else {
+            $rows[] = $this->rowOk('Table', 'true');
+        }
+
+        $this->table(['Check', 'Status', 'Value', 'Hint'], $rows);
     }
 }
