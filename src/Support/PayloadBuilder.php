@@ -61,6 +61,29 @@ class PayloadBuilder
         return $payload;
     }
 
+    public function buildQueueEvent(string $event, array $jobMeta, ?Throwable $exception = null): array
+    {
+        $payload = [
+            'type' => $event, // ex: queue.failed
+            'app' => Config::get('app.name'),
+            'env' => Config::get('app.env'),
+            'timestamp' => Carbon::now()->toIso8601String(),
+            'queue' => $jobMeta,
+        ];
+
+        if ($exception) {
+            $payload['exception'] = [
+                'type' => get_class($exception),
+                'message' => $exception->getMessage(),
+                'code' => $exception->getCode(),
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+            ];
+        }
+
+        return $payload;
+    }
+
     private function sanitizeHeaders(array $headers): array
     {
         $deny = array_map('strtolower', Config::get('catchr.redact_headers', [

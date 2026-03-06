@@ -18,6 +18,13 @@ return [
         'normalize_message' => (bool) env('CATCHR_DEDUPE_NORMALIZE_MESSAGE', true),
     ],
 
+    'queue' => [
+        'enabled' => (bool) env('CATCHR_QUEUE_ENABLED', true),
+        'report_processing' => (bool) env('CATCHR_QUEUE_REPORT_PROCESSING', true),
+        'report_processed' => (bool) env('CATCHR_QUEUE_REPORT_PROCESSED', true),
+        'report_failed' => (bool) env('CATCHR_QUEUE_REPORT_FAILED', true),
+    ],
+
     'public_key' => env('CATCHR_PUBLIC_KEY', null),
     'private_key' => env('CATCHR_PRIVATE_KEY', null),
 ];

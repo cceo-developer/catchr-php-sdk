@@ -1,6 +1,6 @@
 <?php
 
-namespace CceoDeveloper\Catchr\Support;
+namespace CceoDeveloper\Catchr\Support\Exceptions;
 
 use Carbon\Carbon;
 use Illuminate\Contracts\Debug\ExceptionHandler;

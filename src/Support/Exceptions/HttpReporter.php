@@ -1,7 +1,8 @@
 <?php
 
-namespace CceoDeveloper\Catchr\Support;
+namespace CceoDeveloper\Catchr\Support\Exceptions;
 
+use CceoDeveloper\Catchr\Support\PayloadBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
