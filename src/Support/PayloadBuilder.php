@@ -3,6 +3,7 @@
 namespace CceoDeveloper\Catchr\Support;
 
 use Carbon\Carbon;
+use Monolog\LogRecord;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -82,6 +83,24 @@ class PayloadBuilder
         }
 
         return $payload;
+    }
+
+    public function buildLogEvent(LogRecord $record): array
+    {
+        return [
+            'type' => 'log.message',
+            'app' => Config::get('app.name'),
+            'env' => Config::get('app.env'),
+            'timestamp' => Carbon::now()->toIso8601String(),
+            'log' => [
+                'logger' => $record->channel,
+                'level' => $record->level->getName(),
+                'message' => (string) $record->message,
+                'context' => $record->context ?? null,
+                'extra' => $record->extra ?? [],
+                'datetime' => $record->datetime->format(DATE_ATOM),
+            ],
+        ];
     }
 
     private function sanitizeHeaders(array $headers): array
