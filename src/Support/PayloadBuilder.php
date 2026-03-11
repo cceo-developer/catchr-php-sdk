@@ -85,7 +85,7 @@ class PayloadBuilder
      * @param array $payload
      * @return array
      */
-    public function addRequest(?Request $request, array $payload): array
+    private function addRequest(?Request $request, array $payload): array
     {
         if ($request) {
             $payload['http'] = [
