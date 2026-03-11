@@ -26,6 +26,11 @@ return [
         'endpoints' => array_values(array_filter(array_map('trim', explode(',', (string) env('CATCHR_QUEUE_ENDPOINTS', ''))))),
     ],
 
+    'log' => [
+        'enabled' => (bool) env('CATCHR_LOG_ENABLED', true),
+        'endpoints' => array_values(array_filter(array_map('trim', explode(',', (string) env('CATCHR_LOG_ENDPOINTS', ''))))),
+    ],
+
     'public_key' => env('CATCHR_PUBLIC_KEY', null),
     'private_key' => env('CATCHR_PRIVATE_KEY', null),
 ];
