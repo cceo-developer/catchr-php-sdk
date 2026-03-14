@@ -2,7 +2,6 @@
 
 namespace CceoDeveloper\Catchr\Support\Jobs;
 
-use CceoDeveloper\Catchr\Support\CatchrConfig;
 use CceoDeveloper\Catchr\Support\PayloadBuilder;
 use CceoDeveloper\Catchr\Support\Reporter\Reporter;
 use CceoDeveloper\Catchr\Support\Reporter\ReporterConfigFactory;
