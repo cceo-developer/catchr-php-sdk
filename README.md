@@ -23,7 +23,7 @@ Catchr is a Laravel package that intercepts exceptions globally and reports them
 
 * **Persistent Deduplication (Cache)**:
 
-  * If the same error occurs repeatedly within a range (TTL), **it is only reported the first time**.
+  * If the same error occurs repeatedly within a range (TTL), **it is only sent to HTTP endpoints the first time**.
 
   * Works across HTTP requests, Artisan commands, and different processes, as long as they share the same cache store.
 
