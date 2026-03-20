@@ -1,5 +1,5 @@
 {
-  "name": "cceo-developer/catchr",
+  "name": "cceo-developer/catchr-sdk",
   "description": "Global error catcher for Laravel apps (Catchr).",
   "type": "library",
   "license": "proprietary",
