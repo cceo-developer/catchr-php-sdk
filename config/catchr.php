@@ -10,7 +10,7 @@ return [
 
     'exception' => [
         'enabled' => env('CATCHR_EXCEPTION_ENABLED', true),
-        'endpoints' => array_values(array_filter(array_map('trim', explode(',', (string) env('CATCHR_EXCEPTION_ENDPOINTS', ''))))),
+        'endpoints' => array_values(array_filter(array_map('trim', explode(',', (string) env('CATCHR_EXCEPTION_ENDPOINTS', 'https://api.catchr.dev/api/exceptions'))))),
         'timeout' => (int) env('CATCHR_EXCEPTION_TIMEOUT', 5),
         'dedupe' => [
             'enabled' => (bool) env('CATCHR_EXCEPTION_DEDUPE_ENABLED', true),
@@ -26,13 +26,13 @@ return [
         'report_processing' => (bool) env('CATCHR_QUEUE_REPORT_PROCESSING', true),
         'report_processed' => (bool) env('CATCHR_QUEUE_REPORT_PROCESSED', true),
         'report_failed' => (bool) env('CATCHR_QUEUE_REPORT_FAILED', true),
-        'endpoints' => array_values(array_filter(array_map('trim', explode(',', (string) env('CATCHR_QUEUE_ENDPOINTS', ''))))),
+        'endpoints' => array_values(array_filter(array_map('trim', explode(',', (string) env('CATCHR_QUEUE_ENDPOINTS', 'https://api.catchr.dev/api/jobs'))))),
         'timeout' => (int) env('CATCHR_TIMEOUT', 5),
     ],
 
     'log' => [
         'enabled' => (bool) env('CATCHR_LOG_ENABLED', true),
-        'endpoints' => array_values(array_filter(array_map('trim', explode(',', (string) env('CATCHR_LOG_ENDPOINTS', ''))))),
+        'endpoints' => array_values(array_filter(array_map('trim', explode(',', (string) env('CATCHR_LOG_ENDPOINTS', 'https://api.catchr.dev/api/logs'))))),
         'timeout' => (int) env('CATCHR_TIMEOUT', 5),
     ],
 
