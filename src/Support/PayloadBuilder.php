@@ -14,19 +14,15 @@ class PayloadBuilder
 {
     public function build(Throwable $e, ?Request $request = null): array
     {
-        $payload = [
-            'app' => Config::get('app.name'),
-            'env' => Config::get('app.env'),
-            'timestamp' => Carbon::now()->toIso8601String(),
-            'exception' => [
-                'type' => get_class($e),
-                'message' => $e->getMessage(),
-                'code' => $e->getCode(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'code_snippet' => $this->codeSnippet($e->getFile(), $e->getLine()),
-                'trace' => collect($e->getTrace())->all()
-            ],
+        $payload = $this->withDefaultMetadata('exception');
+        $payload['exception'] = [
+            'type' => get_class($e),
+            'message' => $e->getMessage(),
+            'code' => $e->getCode(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'code_snippet' => $this->codeSnippet($e->getFile(), $e->getLine()),
+            'trace' => collect($e->getTrace())->all()
         ];
 
         if ($e instanceof QueryException) {
@@ -41,13 +37,8 @@ class PayloadBuilder
 
     public function buildQueueEvent(string $event, array $jobMeta, ?Throwable $exception = null, ?Request $request = null): array
     {
-        $payload = [
-            'type' => $event, // ex: queue.failed
-            'app' => Config::get('app.name'),
-            'env' => Config::get('app.env'),
-            'timestamp' => Carbon::now()->toIso8601String(),
-            'queue' => $jobMeta,
-        ];
+        $payload = $this->withDefaultMetadata($event);
+        $payload['queue'] = $jobMeta;
 
         if ($exception) {
             $payload['exception'] = [
@@ -64,19 +55,30 @@ class PayloadBuilder
 
     public function buildLogEvent(LogRecord $record): array
     {
+        $payload = $this->withDefaultMetadata('log');
+        $payload['log'] = [
+            'logger' => $record->channel,
+            'level' => $record->level->getName(),
+            'message' => (string) $record->message,
+            'context' => $record->context ?? null,
+            'extra' => $record->extra ?? [],
+            'datetime' => $record->datetime->format(DATE_ATOM),
+        ];
+
+        return $payload;
+    }
+
+    /**
+     * @param string $type
+     * @return array
+     */
+    private function withDefaultMetadata(string $type): array
+    {
         return [
-            'type' => 'log.message',
+            'type' => $type,
             'app' => Config::get('app.name'),
             'env' => Config::get('app.env'),
             'timestamp' => Carbon::now()->toIso8601String(),
-            'log' => [
-                'logger' => $record->channel,
-                'level' => $record->level->getName(),
-                'message' => (string) $record->message,
-                'context' => $record->context ?? null,
-                'extra' => $record->extra ?? [],
-                'datetime' => $record->datetime->format(DATE_ATOM),
-            ],
         ];
     }
 
