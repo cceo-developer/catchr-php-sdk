@@ -2,6 +2,7 @@
 
 namespace CceoDeveloper\Catchr\Support\Exceptions;
 
+use BadMethodCallException;
 use Carbon\Carbon;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Support\Facades\Cache;
@@ -116,5 +117,35 @@ readonly class WrappedExceptionHandler implements ExceptionHandler
     public function renderForConsole($output, Throwable $e): void
     {
         $this->inner->renderForConsole($output, $e);
+    }
+
+    public function reportable(callable $callback)
+    {
+        if (method_exists($this->inner, 'reportable')) {
+            return $this->inner->reportable($callback);
+        }
+
+        return null;
+    }
+
+    public function renderable(callable $callback)
+    {
+        if (method_exists($this->inner, 'renderable')) {
+            return $this->inner->renderable($callback);
+        }
+
+        return null;
+    }
+
+    /**
+     * Dynamic Forward for any handler new method
+     */
+    public function __call($method, $arguments)
+    {
+        if (method_exists($this->inner, $method)) {
+            return $this->inner->{$method}(...$arguments);
+        }
+
+        throw new BadMethodCallException("Method {$method} does not exist.");
     }
 }
